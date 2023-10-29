@@ -1,0 +1,40 @@
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+    vector<int> inDegree(numCourses, 0);
+    vector<vector<int>> adjList(numCourses, vector<int>());
+    
+    // Build the in-degree and adjacency list
+    for (const auto& prereq : prerequisites) {
+        int course = prereq[0];
+        int prerequisite = prereq[1];
+        inDegree[course]++;
+        adjList[prerequisite].push_back(course);
+    }
+    
+    // Queue for courses with no prerequisites
+    queue<int> q;
+    for (int i = 0; i < numCourses; ++i) {
+        if (inDegree[i] == 0) {
+            q.push(i);
+        }
+    }
+    
+    // Perform topological sorting
+    while (!q.empty()) {
+        int course = q.front();
+        q.pop();
+        numCourses--;
+        for (int neighbor : adjList[course]) {
+            if (--inDegree[neighbor] == 0) {
+                q.push(neighbor);
+            }
+        }
+    }
+    
+    // If all courses can be taken (numCourses == 0), return true. Otherwise, return false.
+    return numCourses == 0;
+}
